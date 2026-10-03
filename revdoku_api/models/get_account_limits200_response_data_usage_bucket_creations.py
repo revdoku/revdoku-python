@@ -17,21 +17,24 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Any, ClassVar, Dict, List
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
 
-class EmailSummaryFiles(BaseModel):
+class GetAccountLimits200ResponseDataUsageBucketCreations(BaseModel):
     """
-    Included only with include_storage=true for file-browser integration.
+    GetAccountLimits200ResponseDataUsageBucketCreations
     """ # noqa: E501
-    body_id: Optional[StrictStr]
-    original_id: Optional[StrictStr]
-    attachment_ids: List[StrictStr]
+    used: Annotated[int, Field(strict=True, ge=0)]
+    remaining: Annotated[int, Field(strict=True, ge=0)]
+    monthly_limit: Annotated[int, Field(strict=True, ge=0)]
+    resets_at: datetime
     additional_properties: Dict[str, Any] = {}
-    __properties: ClassVar[List[str]] = ["body_id", "original_id", "attachment_ids"]
+    __properties: ClassVar[List[str]] = ["used", "remaining", "monthly_limit", "resets_at"]
 
     model_config = ConfigDict(
         validate_by_name=True,
@@ -51,7 +54,7 @@ class EmailSummaryFiles(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of EmailSummaryFiles from a JSON string"""
+        """Create an instance of GetAccountLimits200ResponseDataUsageBucketCreations from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -79,21 +82,11 @@ class EmailSummaryFiles(BaseModel):
             for _key, _value in self.additional_properties.items():
                 _dict[_key] = _value
 
-        # set to None if body_id (nullable) is None
-        # and model_fields_set contains the field
-        if self.body_id is None and "body_id" in self.model_fields_set:
-            _dict['body_id'] = None
-
-        # set to None if original_id (nullable) is None
-        # and model_fields_set contains the field
-        if self.original_id is None and "original_id" in self.model_fields_set:
-            _dict['original_id'] = None
-
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of EmailSummaryFiles from a dict"""
+        """Create an instance of GetAccountLimits200ResponseDataUsageBucketCreations from a dict"""
         if obj is None:
             return None
 
@@ -101,9 +94,10 @@ class EmailSummaryFiles(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "body_id": obj.get("body_id"),
-            "original_id": obj.get("original_id"),
-            "attachment_ids": obj.get("attachment_ids")
+            "used": obj.get("used"),
+            "remaining": obj.get("remaining"),
+            "monthly_limit": obj.get("monthly_limit"),
+            "resets_at": obj.get("resets_at")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

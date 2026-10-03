@@ -17,21 +17,20 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictStr
+from pydantic import BaseModel, ConfigDict
 from typing import Any, ClassVar, Dict, List, Optional
+from revdoku_api.models.get_account_limits200_response_data_usage_bucket_creations import GetAccountLimits200ResponseDataUsageBucketCreations
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
 
-class EmailSummaryFiles(BaseModel):
+class GetAccountLimits200ResponseDataUsage(BaseModel):
     """
-    Included only with include_storage=true for file-browser integration.
+    Present only for full-account administrator credentials and full-account browser sessions.
     """ # noqa: E501
-    body_id: Optional[StrictStr]
-    original_id: Optional[StrictStr]
-    attachment_ids: List[StrictStr]
+    bucket_creations: Optional[GetAccountLimits200ResponseDataUsageBucketCreations] = None
     additional_properties: Dict[str, Any] = {}
-    __properties: ClassVar[List[str]] = ["body_id", "original_id", "attachment_ids"]
+    __properties: ClassVar[List[str]] = ["bucket_creations"]
 
     model_config = ConfigDict(
         validate_by_name=True,
@@ -51,7 +50,7 @@ class EmailSummaryFiles(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of EmailSummaryFiles from a JSON string"""
+        """Create an instance of GetAccountLimits200ResponseDataUsage from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,26 +73,19 @@ class EmailSummaryFiles(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of bucket_creations
+        if self.bucket_creations:
+            _dict['bucket_creations'] = self.bucket_creations.to_dict()
         # puts key-value pairs in additional_properties in the top level
         if self.additional_properties is not None:
             for _key, _value in self.additional_properties.items():
                 _dict[_key] = _value
 
-        # set to None if body_id (nullable) is None
-        # and model_fields_set contains the field
-        if self.body_id is None and "body_id" in self.model_fields_set:
-            _dict['body_id'] = None
-
-        # set to None if original_id (nullable) is None
-        # and model_fields_set contains the field
-        if self.original_id is None and "original_id" in self.model_fields_set:
-            _dict['original_id'] = None
-
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of EmailSummaryFiles from a dict"""
+        """Create an instance of GetAccountLimits200ResponseDataUsage from a dict"""
         if obj is None:
             return None
 
@@ -101,9 +93,7 @@ class EmailSummaryFiles(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "body_id": obj.get("body_id"),
-            "original_id": obj.get("original_id"),
-            "attachment_ids": obj.get("attachment_ids")
+            "bucket_creations": GetAccountLimits200ResponseDataUsageBucketCreations.from_dict(obj["bucket_creations"]) if obj.get("bucket_creations") is not None else None
         })
         # store additional fields in additional_properties
         for _key in obj.keys():
