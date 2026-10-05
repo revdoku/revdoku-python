@@ -3,14 +3,14 @@ import os
 from revdoku_api import ApiClient, Configuration, DefaultApi
 
 key = os.environ["REVDOKU_API_KEY"]
-bucket = os.environ["REVDOKU_BUCKET_ID"]
-if not key or not bucket:
+mailbox = os.environ["REVDOKU_BUCKET_ID"]
+if not key or not mailbox:
     raise ValueError("Set REVDOKU_API_KEY and REVDOKU_BUCKET_ID")
 with ApiClient(Configuration(access_token=key)) as client:
     api = DefaultApi(client)
     offset = 0
     while True:
-        page = api.list_bucket_files(bucket, account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None,
+        page = api.list_mailbox_files(mailbox, account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None,
                                      limit=100, offset=offset).data
         for file in page.files:
             print(json.dumps(file, ensure_ascii=False))
