@@ -1,15 +1,31 @@
-[project]
-name = "revdoku_api"
-version = "2.0.1"
-description = "Revdoku public agent API"
-authors = [
-  {name = "Revdoku",email = "support@revdoku.com"},
-]
-license = { text = "MIT" }
-readme = "README.md"
-keywords = ["OpenAPI", "OpenAPI-Generator", "Revdoku public agent API"]
-requires-python = ">=3.10"
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
 
+[project]
+name = "revdoku"
+version = "2.1.0"
+description = "Revdoku API client for Python: mailboxes for AI agents, with attachments and private file storage."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Revdoku", email = "support@revdoku.com" }]
+requires-python = ">=3.10"
+keywords = ["revdoku", "email", "inbox", "mailbox", "inbound-email", "attachments", "ai-agents", "file-storage", "api", "sdk"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: Communications :: Email",
+  "Typing :: Typed",
+]
 dependencies = [
   "urllib3 (>=2.7.0,<3.0.0)",
   "python-dateutil (>=2.8.2)",
@@ -18,32 +34,24 @@ dependencies = [
 ]
 
 [project.urls]
+Homepage = "https://revdoku.com"
+Documentation = "https://revdoku.com/docs/sdks/python/"
 Repository = "https://github.com/revdoku/revdoku-python"
+Issues = "https://github.com/revdoku/revdoku-python/issues"
 
-[tool.poetry]
-requires-poetry = ">=2.0"
+[tool.setuptools.packages.find]
+include = ["revdoku", "revdoku.*"]
 
-[tool.poetry.group.dev.dependencies]
-pytest = ">= 9.0.3"
-pytest-cov = ">= 2.8.1"
-tox = ">= 3.9.0"
-flake8 = ">= 4.0.0"
-types-python-dateutil = ">= 2.8.19.14"
-mypy = ">= 1.5"
-
-
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+[tool.setuptools.package-data]
+revdoku = ["py.typed", "REFERENCE.md"]
 
 [tool.pylint.'MESSAGES CONTROL']
 extension-pkg-whitelist = "pydantic"
 
 [tool.mypy]
 files = [
-  "revdoku_api",
+  "revdoku",
   #"test",  # auto-generated tests
-  "tests", # hand-written tests
 ]
 # TODO: enable "strict" once all these individual checks are passing
 # strict = true
@@ -79,7 +87,7 @@ disallow_any_generics = true
 
 [[tool.mypy.overrides]]
 module = [
-  "revdoku_api.configuration",
+  "revdoku.configuration",
 ]
 warn_unused_ignores = true
 strict_equality = true

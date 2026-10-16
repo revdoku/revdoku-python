@@ -1,22 +1,20 @@
-import json
 import os
-from revdoku_api import ApiClient, Configuration, DefaultApi
 
-key = os.environ["REVDOKU_API_KEY"]
-mailbox = os.environ["REVDOKU_BUCKET_ID"]
-if not key or not mailbox:
-    raise ValueError("Set REVDOKU_API_KEY and REVDOKU_BUCKET_ID")
-with ApiClient(Configuration(access_token=key)) as client:
-    api = DefaultApi(client)
-    offset = 0
+from revdoku import Revdoku
+
+mailbox_id = os.getenv("REVDOKU_MAILBOX_ID")
+if not mailbox_id:
+    raise SystemExit("Set REVDOKU_MAILBOX_ID")
+with Revdoku(account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None) as client:
+    cursor = None
+    seen = set()
     while True:
-        page = api.list_mailbox_files(mailbox, account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None,
-                                     limit=100, offset=offset).data
+        page = client.list_files(mailbox_id, limit=100, cursor=cursor).data
         for file in page.files:
-            print(json.dumps(client.sanitize_for_serialization(file), ensure_ascii=False))
+            print(file.to_json())
         if not page.pagination.has_more:
             break
-        next_offset = page.pagination.next_offset
-        if next_offset is None or next_offset <= offset:
+        cursor = page.pagination.next_cursor
+        if not cursor or cursor in seen:
             raise RuntimeError("File pagination did not advance")
-        offset = next_offset
+        seen.add(cursor)
