@@ -228,7 +228,7 @@ Parameters: `mailbox_id` (string, required), `account_id` (string), `reason` (st
 
 `client.api.change_mailbox_address(mailbox_id, change_mailbox_address_request)`
 
-Requires a paid plan and mailbox admin permission. Send the current address as expected_address. Omit username for a generated name. A custom-domain change returns 202; read the settings until assignment.status is active or failed. For account owners and administrators the old address becomes an alias unless keep_old_as_alias is false. Without a free alias slot the request returns EMAIL_ALIAS_LIMIT; send false to retire the old address.
+Requires mailbox admin permission and a paid plan, except for a change back to revdokumail. com. Send the current address as expected_address. Omit username for a generated name. A custom-domain change returns 202; read the settings until assignment.status is active or failed. For account owners and administrators the old address becomes an alias unless keep_old_as_alias is false. Without a free alias slot the request returns EMAIL_ALIAS_LIMIT; send false to retire the old address. A change from revdokumail.com to a customer domain always keeps the old address as the revdokumail.com base address, which uses no alias slot. A change from a customer domain back to revdokumail.com makes that base address the main address again at once (200, assignment.status active): username is ignored, no address change is counted and it works on every plan.
 
 Parameters: `mailbox_id` (string, required).
 
@@ -240,7 +240,7 @@ Body `change_mailbox_address_request` (`ChangeMailboxAddressRequest`): `confirm`
 
 `client.api.create_email_alias(mailbox_id, create_email_alias_request)`
 
-Requires a paid plan and a full-account owner or administrator with mailbox-admin permission. The primary address stays unchanged.
+Requires a paid plan and a full-account owner or administrator with mailbox-admin permission. The primary address stays unchanged. On a mailbox whose primary address is on your domain, the first revdokumail.com alias becomes its base address and uses no alias slot.
 
 Parameters: `mailbox_id` (string, required).
 
@@ -252,7 +252,7 @@ Body `create_email_alias_request` (`CreateEmailAliasRequest`): `username` (strin
 
 `client.api.delete_email_alias(mailbox_id, alias_id)`
 
-Stops new and queued deliveries to the alias. Saved emails stay.
+Stops new and queued deliveries to the alias. Saved emails stay. The base address of a mailbox whose primary address is on your domain cannot be removed (`409 EMAIL_ALIAS_BASE`).
 
 Parameters: `mailbox_id` (string, required), `alias_id` (string, required), `account_id` (string), `reason` (string or null).
 
@@ -328,7 +328,7 @@ Parameters: `mailbox_id` (string, required), `account_id` (string), `reason` (st
 
 `client.api.send_email(mailbox_id, send_email_request)`
 
-Requires mailbox write permission. Send only to account members, to other mailboxes of the account, or (on paid plans) to addresses that emailed this mailbox and passed sender authentication. The From name is the mailbox title. Set in_reply_to to reply. Delivery is asynchronous: read delivery.status later. After an unknown result, list direction=sent before you send again.
+Requires mailbox write permission. Send only to account members, to other mailboxes of the account, or to addresses that emailed this mailbox and passed sender authentication; an administrator can turn off each kind. When the mailbox requires approval, delivery.status is awaiting_approval until a person sends, edits or declines the email; do not send it again. Replying to or attaching an email that AI labels marked as Junk returns 403 EMAIL_WITHHELD; one they are still checking returns 503 EMAIL_LABELING_PENDING with Retry-After. The From name is the mailbox title. On the Free plan, the email ends with one line about Revdoku. Set in_reply_to to reply. Delivery is asynchronous: read delivery.status later. After an unknown result, list direction=sent before you send again.
 
 Parameters: `mailbox_id` (string, required).
 
@@ -344,17 +344,17 @@ Returns decoded text and attachment metadata. Reading does not change read statu
 
 Parameters: `mailbox_id` (string, required), `email_id` (string, required), `account_id` (string), `reason` (string or null), `include_storage` (boolean).
 
-### Mark an email read or unread
+### Update an email's read status or labels
 
-`PATCH /v1/mailboxes/{mailbox_id}/emails/{email_id}` · [web reference](https://revdoku.com/api/reference/emails.md#mark-an-email-read-or-unread)
+`PATCH /v1/mailboxes/{mailbox_id}/emails/{email_id}` · [web reference](https://revdoku.com/api/reference/emails.md#update-an-emails-read-status-or-labels)
 
 `client.api.update_email(mailbox_id, email_id, update_email_request)`
 
-Only read status can change.
+Changes read status and custom labels. Send at least one of read, add_labels and remove_labels. Labels need write access. A new label name creates the label. Built-in labels such as Junk change only in the dashboard.
 
 Parameters: `mailbox_id` (string, required), `email_id` (string, required), `include_storage` (boolean).
 
-Body `update_email_request` (`UpdateEmailRequest`): `read` (boolean, required), `account_id` (string), `reason` (string or null).
+Body `update_email_request` (`UpdateEmailRequest`): `read` (boolean), `add_labels` (array of string), `remove_labels` (array of string), `account_id` (string), `reason` (string or null).
 
 ### Delete an email
 
@@ -458,7 +458,7 @@ Parameters: `mailbox_id` (string, required), `file_id` (string, required), `acco
 
 `client.api.delete_file(mailbox_id, file_id)`
 
-Requires mailbox-admin permission. Files under _email/ return EMAIL_PATH_READ_ONLY; delete the email instead.
+Requires mailbox-admin permission. Files under _email/ return EMAIL_PATH_READ_ONLY; delete the email instead. Other top-level folders that start with _ return RESERVED_PATH.
 
 Parameters: `mailbox_id` (string, required), `file_id` (string, required), `account_id` (string), `reason` (string or null).
 
@@ -596,7 +596,7 @@ Parameters: `account_id` (string), `limit` (integer), `cursor` (string).
 
 `client.api.create_email_domain(create_email_domain_request)`
 
-Claims an exact hostname and returns the DNS records to publish. Never change DNS without the domain owner's authorization.
+Claims an exact hostname and returns the ownership record. Read the domain again shortly after for all `required_dns_records`. Never change DNS without the domain owner's authorization.
 
 Body `create_email_domain_request` (`CreateEmailDomainRequest`): `hostname` (string, required), `account_id` (string), `reason` (string or null).
 
@@ -643,3 +643,13 @@ Queues the check and returns the current state. Read the domain again to see the
 Parameters: `domain_id` (string, required).
 
 Body `verify_email_domain_request` (`VerifyEmailDomainRequest`): `account_id` (string), `reason` (string or null).
+
+### Get a one-click DNS setup link
+
+`GET /v1/account/email_domains/{domain_id}/setup_link` · [web reference](https://revdoku.com/api/reference/email-domains.md#get-a-one-click-dns-setup-link)
+
+`client.api.get_email_domain_setup_link(domain_id)`
+
+Signs a Domain Connect link for a domain whose `setup_provider` is set. Give the URL to the domain owner to open in a browser. The DNS provider adds `required_dns_records` after the owner approves them, then returns to Account Settings → Domains. Errors: 422 `EMAIL_DOMAIN_SETUP_UNSUPPORTED` when the provider or the domain state does not allow one-click setup, 422 `EMAIL_DOMAIN_SETUP_UNAVAILABLE` while the deployment cannot sign links, 422 `EMAIL_DNS_CONFLICT` when the hostname has records of another mail provider, 403 `EMAIL_DOMAINS_UPGRADE_REQUIRED` when the plan no longer includes custom email domains, and 503 `EMAIL_DNS_TEMPORARY` when DNS cannot be checked. Add the records manually, or try again later after a 503.
+
+Parameters: `domain_id` (string, required), `account_id` (string).
