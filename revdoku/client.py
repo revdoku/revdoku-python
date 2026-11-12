@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from .models.list_ticket_messages200_response import ListTicketMessages200Response
     from .models.list_tickets200_response import ListTickets200Response
     from .models.reply_to_ticket202_response import ReplyToTicket202Response
+    from .models.get_ticket_message200_response import GetTicketMessage200Response
     from .models.list_files200_response import ListFiles200Response
     from .models.list_buckets200_response import ListBuckets200Response
 
@@ -239,7 +240,7 @@ class Revdoku:
         """Lists the messages of a ticket, oldest first."""
         return self.api.list_ticket_messages(bucket_id, ticket_id, **self._account(filters))
 
-    def get_ticket_message(self, bucket_id: str, ticket_id: str, message_id: str, **options: Any) -> ReplyToTicket202Response:
+    def get_ticket_message(self, bucket_id: str, ticket_id: str, message_id: str, **options: Any) -> GetTicketMessage200Response:
         return self.api.get_ticket_message(bucket_id, ticket_id, message_id, **self._account(options))
 
     def reply_to_ticket(self, bucket_id: str, ticket_id: str, text: str, html: Optional[str] = None,
