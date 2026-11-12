@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "revdoku"
-version = "2.2.0"
-description = "Revdoku API client for Python: mailboxes for AI agents, with attachments and private file storage."
+version = "3.0.0"
+description = "Revdoku API client for Python: publish docs sites for people and AI agents, with a support mailbox and file storage."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Revdoku", email = "support@revdoku.com" }]
 requires-python = ">=3.10"
-keywords = ["revdoku", "email", "inbox", "mailbox", "inbound-email", "attachments", "ai-agents", "file-storage", "api", "sdk"]
+keywords = ["revdoku", "docs", "documentation", "api-docs", "docs-site", "ai-agents", "mcp", "llms-txt", "support-email", "mailbox", "file-storage", "api", "sdk"]
 classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
@@ -35,7 +35,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://revdoku.com"
-Documentation = "https://revdoku.com/docs/sdks/python/"
+Documentation = "https://docs.revdoku.com/sdks/python"
 Repository = "https://github.com/revdoku/revdoku-python"
 Issues = "https://github.com/revdoku/revdoku-python/issues"
 

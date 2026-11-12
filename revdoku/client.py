@@ -20,22 +20,25 @@ from .api_client import ApiClient
 from .api_response import ApiResponse
 from .configuration import Configuration
 from .exceptions import ApiException
-from .models.create_mailbox_request import CreateMailboxRequest
-from .models.mailbox_create import MailboxCreate
-from .models.mailbox_email_options import MailboxEmailOptions
+from .models.create_bucket_request import CreateBucketRequest
+from .models.bucket_create import BucketCreate
+from .models.bucket_email_options import BucketEmailOptions
 from .models.prepare_file_upload_request import PrepareFileUploadRequest
 from .models.save_uploaded_file201_response import SaveUploadedFile201Response
 from .models.save_uploaded_file_request import SaveUploadedFileRequest
 from .models.saved_file import SavedFile
+from .models.ticket_reply_request import TicketReplyRequest
 from .models.upload_blob import UploadBlob
 
 if TYPE_CHECKING:
-    from .models.create_mailbox201_response import CreateMailbox201Response
-    from .models.get_email200_response import GetEmail200Response
-    from .models.get_email_original_download200_response import GetEmailOriginalDownload200Response
-    from .models.list_emails200_response import ListEmails200Response
+    from .models.create_bucket201_response import CreateBucket201Response
+    from .models.get_ticket200_response import GetTicket200Response
+    from .models.get_ticket_message_original_download200_response import GetTicketMessageOriginalDownload200Response
+    from .models.list_ticket_messages200_response import ListTicketMessages200Response
+    from .models.list_tickets200_response import ListTickets200Response
+    from .models.reply_to_ticket202_response import ReplyToTicket202Response
     from .models.list_files200_response import ListFiles200Response
-    from .models.list_mailboxes200_response import ListMailboxes200Response
+    from .models.list_buckets200_response import ListBuckets200Response
 
 DEFAULT_BASE_URL = "https://api.revdoku.com"
 LOCAL_HOSTS = ("localhost", "127.0.0.1", "::1")
@@ -206,43 +209,63 @@ class Revdoku:
             return urllib3.Timeout(connect=value[0], read=value[1])
         return urllib3.Timeout(total=value)
 
-    def list_mailboxes(self, **filters: Any) -> ListMailboxes200Response:
-        return self.api.list_mailboxes(**self._account(filters))
+    def list_buckets(self, **filters: Any) -> ListBuckets200Response:
+        return self.api.list_buckets(**self._account(filters))
 
-    def get_mailbox(self, mailbox_id: str, **options: Any) -> CreateMailbox201Response:
-        return self.api.get_mailbox(mailbox_id, **self._account(options))
+    def get_bucket(self, bucket_id: str, **options: Any) -> CreateBucket201Response:
+        return self.api.get_bucket(bucket_id, **self._account(options))
 
-    def create_mailbox(self, username: Optional[str] = None, domain: Optional[str] = None,
+    def create_bucket(self, username: Optional[str] = None, domain: Optional[str] = None,
                        title: Optional[str] = None, account_id: Optional[str] = None, *,
                        description: Optional[str] = None,
-                       metadata: Optional[Dict[str, Any]] = None, **options: Any) -> CreateMailbox201Response:
-        """Creates one mailbox. After an uncertain result, list mailboxes before you create another.
+                       metadata: Optional[Dict[str, Any]] = None, template: Optional[str] = None,
+                       **options: Any) -> CreateBucket201Response:
+        """Creates one bucket with its email address. After an uncertain result, list buckets before you create another.
+        ``template="docs-api"`` or ``"docs-product"`` starts it with a docs site.
         ``options`` (for example ``_request_timeout``) go to the API call."""
-        email = MailboxEmailOptions(username=username, domain=domain) if username is not None or domain is not None else None
-        return self.api.create_mailbox(CreateMailboxRequest(
+        email = BucketEmailOptions(username=username, domain=domain) if username is not None or domain is not None else None
+        return self.api.create_bucket(CreateBucketRequest(
             account_id=self._account_id if account_id is None else account_id,
-            mailbox=MailboxCreate(title=title, description=description, metadata=metadata, email=email)), **options)
+            bucket=BucketCreate(title=title, description=description, metadata=metadata, email=email, template=template)), **options)
 
-    def list_emails(self, mailbox_id: str, **filters: Any) -> ListEmails200Response:
-        return self.api.list_emails(mailbox_id, **self._account(filters))
+    def list_tickets(self, bucket_id: str, **filters: Any) -> ListTickets200Response:
+        """Lists support tickets, newest activity first. Poll with ``updated_after``."""
+        return self.api.list_tickets(bucket_id, **self._account(filters))
 
-    def get_email(self, mailbox_id: str, email_id: str, **options: Any) -> GetEmail200Response:
-        return self.api.get_email(mailbox_id, email_id, **self._account(options))
+    def get_ticket(self, bucket_id: str, ticket_id: str, **options: Any) -> GetTicket200Response:
+        return self.api.get_ticket(bucket_id, ticket_id, **self._account(options))
 
-    def list_files(self, mailbox_id: str, **filters: Any) -> ListFiles200Response:
-        return self.api.list_files(mailbox_id, **self._account(filters))
+    def list_ticket_messages(self, bucket_id: str, ticket_id: str, **filters: Any) -> ListTicketMessages200Response:
+        """Lists the messages of a ticket, oldest first."""
+        return self.api.list_ticket_messages(bucket_id, ticket_id, **self._account(filters))
 
-    def get_attachment_download(self, mailbox_id: str, email_id: str, attachment_id: str,
-                                **options: Any) -> GetEmailOriginalDownload200Response:
-        return self.api.get_email_attachment_download(mailbox_id, email_id, attachment_id, **self._account(options))
+    def get_ticket_message(self, bucket_id: str, ticket_id: str, message_id: str, **options: Any) -> ReplyToTicket202Response:
+        return self.api.get_ticket_message(bucket_id, ticket_id, message_id, **self._account(options))
 
-    def download_attachment(self, mailbox_id: str, email_id: str, attachment_id: str,
+    def reply_to_ticket(self, bucket_id: str, ticket_id: str, text: str, html: Optional[str] = None,
+                        subject: Optional[str] = None, attachment_ids: Optional[list] = None,
+                        account_id: Optional[str] = None, **options: Any) -> ReplyToTicket202Response:
+        """Replies to the requester of a ticket. After an uncertain result, read the ticket before you reply again.
+        ``options`` (for example ``_request_timeout``) go to the API call."""
+        return self.api.reply_to_ticket(bucket_id, ticket_id, TicketReplyRequest(
+            text=text, html=html, subject=subject, attachment_ids=attachment_ids,
+            account_id=self._account_id if account_id is None else account_id), **options)
+
+    def list_files(self, bucket_id: str, **filters: Any) -> ListFiles200Response:
+        return self.api.list_files(bucket_id, **self._account(filters))
+
+    def get_attachment_download(self, bucket_id: str, ticket_id: str, message_id: str, attachment_id: str,
+                                **options: Any) -> GetTicketMessageOriginalDownload200Response:
+        return self.api.get_ticket_message_attachment_download(bucket_id, ticket_id, message_id, attachment_id,
+                                                               **self._account(options))
+
+    def download_attachment(self, bucket_id: str, ticket_id: str, message_id: str, attachment_id: str,
                             max_bytes: int = 64 * 1024 * 1024, **options: Any) -> bytes:
         """Returns attachment bytes. Does not change shared read status or write local files.
         ``_request_timeout`` applies to the API call and to the storage download."""
         if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes < 0:
             raise ValueError("max_bytes must be a nonnegative integer")
-        download = self.get_attachment_download(mailbox_id, email_id, attachment_id, **options).data.download
+        download = self.get_attachment_download(bucket_id, ticket_id, message_id, attachment_id, **options).data.download
         size = download.size_bytes
         if size is not None and size > max_bytes:
             raise ValueError("Attachment exceeds max_bytes")
@@ -263,14 +286,14 @@ class Revdoku:
             raise ValueError("Attachment size does not match the download metadata")
         return b"".join(chunks)
 
-    def upload_file(self, mailbox_id: str, path: str, content: Union[bytes, bytearray, memoryview, str],
+    def upload_file(self, bucket_id: str, path: str, content: Union[bytes, bytearray, memoryview, str],
                     content_type: Optional[str] = None, account_id: Optional[str] = None,
-                    expected_mailbox_version: Optional[str] = None, **options: Any) -> SaveUploadedFile201Response:
-        """Uploads bytes and saves a file version. Pass the mailbox version_id to protect concurrent edits.
+                    expected_bucket_version: Optional[str] = None, **options: Any) -> SaveUploadedFile201Response:
+        """Uploads bytes and saves a file version. Pass the bucket version_id to protect concurrent edits.
         ``options`` (for example ``_request_timeout``) go to both API calls; ``_request_timeout`` also applies to the storage upload."""
         if (not isinstance(path, str) or not path or path.startswith("/") or "\\" in path
                 or any(part in ("", ".", "..") for part in path.split("/"))):
-            raise ValueError("path must be a mailbox-relative file path")
+            raise ValueError("path must be a bucket-relative file path")
         if isinstance(content, str):
             data = content.encode("utf-8")
         elif isinstance(content, (bytes, bytearray, memoryview)):
@@ -278,10 +301,10 @@ class Revdoku:
         else:
             raise TypeError("content must be str, bytes, bytearray or memoryview")
         account = self._account_id if account_id is None else account_id
-        prepared = self.api.prepare_file_upload(PrepareFileUploadRequest(
-            mailbox_id=mailbox_id, account_id=account, path=path, blob=UploadBlob(
+        prepared = self.api.prepare_file_upload(bucket_id, PrepareFileUploadRequest(
+            account_id=account, path=path, blob=UploadBlob(
                 filename=path.rsplit("/", 1)[-1], byte_size=len(data),
-                content_type=content_type or "application/octet-stream", purpose="mailbox_file",
+                content_type=content_type or "application/octet-stream", purpose="bucket_file",
                 checksum=base64.b64encode(hashlib.md5(data, usedforsecurity=False).digest()).decode("ascii"),
                 sha256=hashlib.sha256(data).hexdigest())), **options).data
         if prepared.skipped and prepared.duplicate and prepared.file and prepared.version:
@@ -298,6 +321,6 @@ class Revdoku:
         response.close()
         if not 200 <= response.status < 300:
             raise RuntimeError(f"Storage upload failed: HTTP {response.status}")
-        return self.api.save_uploaded_file(mailbox_id, SaveUploadedFileRequest(
+        return self.api.save_uploaded_file(bucket_id, SaveUploadedFileRequest(
             account_id=account, path=path, signed_blob_id=prepared.signed_id,
-            expected_mailbox_version=expected_mailbox_version), **options)
+            expected_bucket_version=expected_bucket_version), **options)

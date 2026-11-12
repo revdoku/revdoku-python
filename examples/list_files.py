@@ -2,14 +2,14 @@ import os
 
 from revdoku import Revdoku
 
-mailbox_id = os.getenv("REVDOKU_MAILBOX_ID")
-if not mailbox_id:
-    raise SystemExit("Set REVDOKU_MAILBOX_ID")
+bucket_id = os.getenv("REVDOKU_BUCKET_ID")
+if not bucket_id:
+    raise SystemExit("Set REVDOKU_BUCKET_ID")
 with Revdoku(account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None) as client:
     cursor = None
     seen = set()
     while True:
-        page = client.list_files(mailbox_id, limit=100, cursor=cursor).data
+        page = client.list_files(bucket_id, limit=100, cursor=cursor).data
         for file in page.files:
             print(file.to_json())
         if not page.pagination.has_more:
