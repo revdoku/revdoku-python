@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import base64
-import hashlib
 import json
 import math
 import os
@@ -23,12 +21,7 @@ from .exceptions import ApiException
 from .models.create_bucket_request import CreateBucketRequest
 from .models.bucket_create import BucketCreate
 from .models.bucket_email_options import BucketEmailOptions
-from .models.prepare_file_upload_request import PrepareFileUploadRequest
-from .models.save_uploaded_file201_response import SaveUploadedFile201Response
-from .models.save_uploaded_file_request import SaveUploadedFileRequest
-from .models.saved_file import SavedFile
 from .models.ticket_reply_request import TicketReplyRequest
-from .models.upload_blob import UploadBlob
 
 if TYPE_CHECKING:
     from .models.create_bucket201_response import CreateBucket201Response
@@ -219,15 +212,14 @@ class Revdoku:
     def create_bucket(self, username: Optional[str] = None, domain: Optional[str] = None,
                        title: Optional[str] = None, account_id: Optional[str] = None, *,
                        description: Optional[str] = None,
-                       metadata: Optional[Dict[str, Any]] = None, template: Optional[str] = None,
+                       metadata: Optional[Dict[str, Any]] = None,
                        **options: Any) -> CreateBucket201Response:
         """Creates one bucket with its email address. After an uncertain result, list buckets before you create another.
-        ``template="docs-api"`` or ``"docs-product"`` starts it with a docs site.
         ``options`` (for example ``_request_timeout``) go to the API call."""
         email = BucketEmailOptions(username=username, domain=domain) if username is not None or domain is not None else None
         return self.api.create_bucket(CreateBucketRequest(
             account_id=self._account_id if account_id is None else account_id,
-            bucket=BucketCreate(title=title, description=description, metadata=metadata, email=email, template=template)), **options)
+            bucket=BucketCreate(title=title, description=description, metadata=metadata, email=email)), **options)
 
     def list_tickets(self, bucket_id: str, **filters: Any) -> ListTickets200Response:
         """Lists support tickets, newest activity first. Poll with ``updated_after``."""
@@ -286,42 +278,3 @@ class Revdoku:
         if size is not None and length != size:
             raise ValueError("Attachment size does not match the download metadata")
         return b"".join(chunks)
-
-    def upload_file(self, bucket_id: str, path: str, content: Union[bytes, bytearray, memoryview, str],
-                    content_type: Optional[str] = None, account_id: Optional[str] = None,
-                    expected_bucket_version: Optional[str] = None, **options: Any) -> SaveUploadedFile201Response:
-        """Uploads bytes and saves a file version. Pass the bucket version_id to protect concurrent edits.
-        ``options`` (for example ``_request_timeout``) go to both API calls; ``_request_timeout`` also applies to the storage upload."""
-        if (not isinstance(path, str) or not path or path.startswith("/") or "\\" in path
-                or any(part in ("", ".", "..") for part in path.split("/"))):
-            raise ValueError("path must be a bucket-relative file path")
-        if isinstance(content, str):
-            data = content.encode("utf-8")
-        elif isinstance(content, (bytes, bytearray, memoryview)):
-            data = bytes(content)
-        else:
-            raise TypeError("content must be str, bytes, bytearray or memoryview")
-        account = self._account_id if account_id is None else account_id
-        prepared = self.api.prepare_file_upload(bucket_id, PrepareFileUploadRequest(
-            account_id=account, path=path, blob=UploadBlob(
-                filename=path.rsplit("/", 1)[-1], byte_size=len(data),
-                content_type=content_type or "application/octet-stream", purpose="bucket_file",
-                checksum=base64.b64encode(hashlib.md5(data, usedforsecurity=False).digest()).decode("ascii"),
-                sha256=hashlib.sha256(data).hexdigest())), **options).data
-        if prepared.skipped and prepared.duplicate and prepared.file and prepared.version:
-            return SaveUploadedFile201Response(success=True, data=SavedFile(
-                file=prepared.file, version=prepared.version, created=False, duplicate=True))
-        upload = prepared.direct_upload
-        if upload is None or not prepared.signed_id:
-            raise ValueError("Upload preparation did not return a storage destination")
-        headers = dict(upload.headers or {})
-        if any(name.lower() in ("authorization", "cookie") for name in headers):
-            raise ValueError("Unexpected credentials in storage upload headers")
-        response = self._storage.request("PUT", self._storage_url(upload.url), body=data, headers=headers,
-                                         preload_content=False, timeout=self._storage_timeout(options.get("_request_timeout")))
-        response.close()
-        if not 200 <= response.status < 300:
-            raise RuntimeError(f"Storage upload failed: HTTP {response.status}")
-        return self.api.save_uploaded_file(bucket_id, SaveUploadedFileRequest(
-            account_id=account, path=path, signed_blob_id=prepared.signed_id,
-            expected_bucket_version=expected_bucket_version), **options)

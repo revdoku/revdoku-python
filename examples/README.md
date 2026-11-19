@@ -4,7 +4,7 @@ These examples run the SDK from this repository. To use the SDK in your own
 application, install it from the package registry instead: see
 [Use the SDK in your application](#use-the-sdk-in-your-application).
 
-A **bucket** has its own email address and private file storage. Each conversation
+A **bucket** has its own email address and the files of its docs site. Each conversation
 that arrives there is a support ticket. Keep the bucket's `bkt_...` ID for later requests. Run the examples on your computer or backend,
 and keep the API key there.
 
@@ -37,7 +37,6 @@ Run only the command for your current step, from the repository directory:
 | Create bucket | `python examples/create_bucket.py` | [Source](create_bucket.py) |
 | Read tickets | `python examples/read_tickets.py` | [Source](read_tickets.py) |
 | Download attachment | `python examples/download_attachment.py` | [Source](download_attachment.py) |
-| Upload file | `python examples/upload_file.py ./notes.txt` | [Source](upload_file.py) |
 | List files | `python examples/list_files.py` | [Source](list_files.py) |
 
 ## Configure
@@ -55,7 +54,7 @@ Run only the command for your current step, from the repository directory:
 | Task | Access needed |
 | --- | --- |
 | List and read tickets, download attachments, list files | Read access to that bucket |
-| Reply to a ticket, solve it, change its labels, upload files | Write access to that bucket |
+| Reply to a ticket, solve it, change its labels | Write access to that bucket |
 | Create another bucket | Admin access to the account. A key for selected buckets cannot create buckets. |
 | Delete a message | Admin access to that bucket |
 
@@ -98,7 +97,7 @@ example `https://api.revdoku.com/v1/buckets`. The SDK takes the origin without
    ```
 
    Run **Download attachment**. It prints the saved path. The example never overwrites a file.
-5. **Run Upload file** with a local file, then **List files** to see the files in the bucket.
+5. **Run List files** to see the files in the bucket. They are a read-only copy of the bucket's GitHub repository.
 
 ## Understand the results
 
