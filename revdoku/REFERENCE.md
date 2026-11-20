@@ -442,7 +442,7 @@ Publishes the bucket's files as its site, or republishes them. The build runs in
 
 Parameters: `bucket_id` (string, required).
 
-Body `publish_request` (`PublishRequest`, optional): `access_mode` (string: `public`, `password`, `require_email`), `password` (string), `reason` (string).
+Body `publish_request` (`PublishRequest`, optional): `access_mode` (string: `public`, `password`, `require_email`), `password` (string), `support_handoff` (string: `form`, `form_email`, `email`, `link`), `support_link_url` (string (uri)), `reason` (string).
 
 ### Unpublish the site
 
