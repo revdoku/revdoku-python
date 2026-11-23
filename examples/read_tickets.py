@@ -5,9 +5,9 @@ import time
 
 from revdoku import Revdoku, RevdokuError
 
-bucket_id = os.getenv("REVDOKU_BUCKET_ID")
-if not bucket_id:
-    raise SystemExit("Set REVDOKU_BUCKET_ID")
+project_id = os.getenv("REVDOKU_PROJECT_ID")
+if not project_id:
+    raise SystemExit("Set REVDOKU_PROJECT_ID")
 
 
 def read_message(client, ticket_id, message_id):
@@ -15,7 +15,7 @@ def read_message(client, ticket_id, message_id):
     returns 503 EMAIL_LABELING_PENDING with Retry-After."""
     for _ in range(12):
         try:
-            return client.get_ticket_message(bucket_id, ticket_id, message_id).data.message
+            return client.get_ticket_message(project_id, ticket_id, message_id).data.message
         except RevdokuError as error:
             if error.code != "EMAIL_LABELING_PENDING":
                 raise
@@ -28,9 +28,9 @@ with Revdoku(account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None) as client:
     cursor = None
     seen = set()
     while True:
-        page = client.list_tickets(bucket_id, limit=100, status="open", cursor=cursor).data
+        page = client.list_tickets(project_id, limit=100, status="open", cursor=cursor).data
         for ticket in page.tickets:
-            for summary in client.list_ticket_messages(bucket_id, ticket.id).data.messages:
+            for summary in client.list_ticket_messages(project_id, ticket.id).data.messages:
                 if summary.direction != "received":
                     continue
                 if any(label.name == "Junk" for label in summary.labels):

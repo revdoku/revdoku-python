@@ -18,13 +18,13 @@ from .api_client import ApiClient
 from .api_response import ApiResponse
 from .configuration import Configuration
 from .exceptions import ApiException
-from .models.create_bucket_request import CreateBucketRequest
-from .models.bucket_create import BucketCreate
-from .models.bucket_email_options import BucketEmailOptions
+from .models.create_project_request import CreateProjectRequest
+from .models.project_create import ProjectCreate
+from .models.project_email_options import ProjectEmailOptions
 from .models.ticket_reply_request import TicketReplyRequest
 
 if TYPE_CHECKING:
-    from .models.create_bucket201_response import CreateBucket201Response
+    from .models.create_project201_response import CreateProject201Response
     from .models.get_ticket200_response import GetTicket200Response
     from .models.get_ticket_message_original_download200_response import GetTicketMessageOriginalDownload200Response
     from .models.list_ticket_messages200_response import ListTicketMessages200Response
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from .models.reply_to_ticket202_response import ReplyToTicket202Response
     from .models.get_ticket_message200_response import GetTicketMessage200Response
     from .models.list_files200_response import ListFiles200Response
-    from .models.list_buckets200_response import ListBuckets200Response
+    from .models.list_projects200_response import ListProjects200Response
 
 DEFAULT_BASE_URL = "https://api.revdoku.com"
 LOCAL_HOSTS = ("localhost", "127.0.0.1", "::1")
@@ -203,62 +203,62 @@ class Revdoku:
             return urllib3.Timeout(connect=value[0], read=value[1])
         return urllib3.Timeout(total=value)
 
-    def list_buckets(self, **filters: Any) -> ListBuckets200Response:
-        return self.api.list_buckets(**self._account(filters))
+    def list_projects(self, **filters: Any) -> ListProjects200Response:
+        return self.api.list_projects(**self._account(filters))
 
-    def get_bucket(self, bucket_id: str, **options: Any) -> CreateBucket201Response:
-        return self.api.get_bucket(bucket_id, **self._account(options))
+    def get_project(self, project_id: str, **options: Any) -> CreateProject201Response:
+        return self.api.get_project(project_id, **self._account(options))
 
-    def create_bucket(self, username: Optional[str] = None, domain: Optional[str] = None,
+    def create_project(self, username: Optional[str] = None, domain: Optional[str] = None,
                        title: Optional[str] = None, account_id: Optional[str] = None, *,
                        description: Optional[str] = None,
                        metadata: Optional[Dict[str, Any]] = None,
-                       **options: Any) -> CreateBucket201Response:
-        """Creates one bucket with its email address. After an uncertain result, list buckets before you create another.
+                       **options: Any) -> CreateProject201Response:
+        """Creates one project with its email address. After an uncertain result, list projects before you create another.
         ``options`` (for example ``_request_timeout``) go to the API call."""
-        email = BucketEmailOptions(username=username, domain=domain) if username is not None or domain is not None else None
-        return self.api.create_bucket(CreateBucketRequest(
+        email = ProjectEmailOptions(username=username, domain=domain) if username is not None or domain is not None else None
+        return self.api.create_project(CreateProjectRequest(
             account_id=self._account_id if account_id is None else account_id,
-            bucket=BucketCreate(title=title, description=description, metadata=metadata, email=email)), **options)
+            project=ProjectCreate(title=title, description=description, metadata=metadata, email=email)), **options)
 
-    def list_tickets(self, bucket_id: str, **filters: Any) -> ListTickets200Response:
+    def list_tickets(self, project_id: str, **filters: Any) -> ListTickets200Response:
         """Lists support tickets, newest activity first. Poll with ``updated_after``."""
-        return self.api.list_tickets(bucket_id, **self._account(filters))
+        return self.api.list_tickets(project_id, **self._account(filters))
 
-    def get_ticket(self, bucket_id: str, ticket_id: str, **options: Any) -> GetTicket200Response:
-        return self.api.get_ticket(bucket_id, ticket_id, **self._account(options))
+    def get_ticket(self, project_id: str, ticket_id: str, **options: Any) -> GetTicket200Response:
+        return self.api.get_ticket(project_id, ticket_id, **self._account(options))
 
-    def list_ticket_messages(self, bucket_id: str, ticket_id: str, **filters: Any) -> ListTicketMessages200Response:
+    def list_ticket_messages(self, project_id: str, ticket_id: str, **filters: Any) -> ListTicketMessages200Response:
         """Lists the messages of a ticket, oldest first."""
-        return self.api.list_ticket_messages(bucket_id, ticket_id, **self._account(filters))
+        return self.api.list_ticket_messages(project_id, ticket_id, **self._account(filters))
 
-    def get_ticket_message(self, bucket_id: str, ticket_id: str, message_id: str, **options: Any) -> GetTicketMessage200Response:
-        return self.api.get_ticket_message(bucket_id, ticket_id, message_id, **self._account(options))
+    def get_ticket_message(self, project_id: str, ticket_id: str, message_id: str, **options: Any) -> GetTicketMessage200Response:
+        return self.api.get_ticket_message(project_id, ticket_id, message_id, **self._account(options))
 
-    def reply_to_ticket(self, bucket_id: str, ticket_id: str, text: str, html: Optional[str] = None,
+    def reply_to_ticket(self, project_id: str, ticket_id: str, text: str, html: Optional[str] = None,
                         subject: Optional[str] = None, attachment_ids: Optional[list] = None,
                         account_id: Optional[str] = None, **options: Any) -> ReplyToTicket202Response:
         """Replies to the requester of a ticket. After an uncertain result, read the ticket before you reply again.
         ``options`` (for example ``_request_timeout``) go to the API call."""
-        return self.api.reply_to_ticket(bucket_id, ticket_id, TicketReplyRequest(
+        return self.api.reply_to_ticket(project_id, ticket_id, TicketReplyRequest(
             text=text, html=html, subject=subject, attachment_ids=attachment_ids,
             account_id=self._account_id if account_id is None else account_id), **options)
 
-    def list_files(self, bucket_id: str, **filters: Any) -> ListFiles200Response:
-        return self.api.list_files(bucket_id, **self._account(filters))
+    def list_files(self, project_id: str, **filters: Any) -> ListFiles200Response:
+        return self.api.list_files(project_id, **self._account(filters))
 
-    def get_attachment_download(self, bucket_id: str, ticket_id: str, message_id: str, attachment_id: str,
+    def get_attachment_download(self, project_id: str, ticket_id: str, message_id: str, attachment_id: str,
                                 **options: Any) -> GetTicketMessageOriginalDownload200Response:
-        return self.api.get_ticket_message_attachment_download(bucket_id, ticket_id, message_id, attachment_id,
+        return self.api.get_ticket_message_attachment_download(project_id, ticket_id, message_id, attachment_id,
                                                                **self._account(options))
 
-    def download_attachment(self, bucket_id: str, ticket_id: str, message_id: str, attachment_id: str,
+    def download_attachment(self, project_id: str, ticket_id: str, message_id: str, attachment_id: str,
                             max_bytes: int = 64 * 1024 * 1024, **options: Any) -> bytes:
         """Returns attachment bytes. Does not change shared read status or write local files.
         ``_request_timeout`` applies to the API call and to the storage download."""
         if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes < 0:
             raise ValueError("max_bytes must be a nonnegative integer")
-        download = self.get_attachment_download(bucket_id, ticket_id, message_id, attachment_id, **options).data.download
+        download = self.get_attachment_download(project_id, ticket_id, message_id, attachment_id, **options).data.download
         size = download.size_bytes
         if size is not None and size > max_bytes:
             raise ValueError("Attachment exceeds max_bytes")
