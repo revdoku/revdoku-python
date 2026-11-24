@@ -1,6 +1,6 @@
 # Revdoku API reference for Python
 
-Generated from the Revdoku OpenAPI. Web version with examples: https://docs.revdoku.com/api-reference
+Generated from the Revdoku OpenAPI. Web version with examples: https://support.revdoku.com/docs/api-reference
 
 ```sh
 pip install revdoku
@@ -42,7 +42,7 @@ Operations that need no API key run before you have one. They use the generated 
 
 ### Email a sign-in code
 
-`POST /v1/auth/sign_in_code` · [web reference](https://docs.revdoku.com/api-reference/authentication#email-a-sign-in-code)
+`POST /v1/auth/sign_in_code` · [web reference](https://support.revdoku.com/docs/api-reference/authentication#email-a-sign-in-code)
 
 `DefaultApi().request_sign_in_code(request_sign_in_code_request)`
 
@@ -52,7 +52,7 @@ Body `request_sign_in_code_request` (`RequestSignInCodeRequest`): `email` (strin
 
 ### Exchange a sign-in code for an API key
 
-`POST /v1/auth/sign_in_code/verify` · [web reference](https://docs.revdoku.com/api-reference/authentication#exchange-a-sign-in-code-for-an-api-key)
+`POST /v1/auth/sign_in_code/verify` · [web reference](https://support.revdoku.com/docs/api-reference/authentication#exchange-a-sign-in-code-for-an-api-key)
 
 `DefaultApi().verify_sign_in_code(verify_sign_in_code_request)`
 
@@ -62,7 +62,7 @@ Body `verify_sign_in_code_request` (`VerifySignInCodeRequest`): `email` (string 
 
 ### Exchange a one-time dashboard connection code for an API key
 
-`POST /v1/auth/grant/exchange` · [web reference](https://docs.revdoku.com/api-reference/authentication#exchange-a-one-time-dashboard-connection-code-for-an-api-key)
+`POST /v1/auth/grant/exchange` · [web reference](https://support.revdoku.com/docs/api-reference/authentication#exchange-a-one-time-dashboard-connection-code-for-an-api-key)
 
 `DefaultApi().exchange_connection_grant(exchange_connection_grant_request)`
 
@@ -72,7 +72,7 @@ Body `exchange_connection_grant_request` (`ExchangeConnectionGrantRequest`): `gr
 
 ### Create a dashboard link
 
-`POST /v1/auth/dashboard_link` · [web reference](https://docs.revdoku.com/api-reference/authentication#create-a-dashboard-link)
+`POST /v1/auth/dashboard_link` · [web reference](https://support.revdoku.com/docs/api-reference/authentication#create-a-dashboard-link)
 
 `client.api.create_dashboard_link(create_dashboard_link_request)`
 
@@ -84,7 +84,7 @@ Body `create_dashboard_link_request` (`CreateDashboardLinkRequest`): `redirect_p
 
 ### Read the connection and selected account
 
-`GET /v1/status` · [web reference](https://docs.revdoku.com/api-reference/accounts#read-the-connection-and-selected-account)
+`GET /v1/status` · [web reference](https://support.revdoku.com/docs/api-reference/accounts#read-the-connection-and-selected-account)
 
 `client.api.get_status()`
 
@@ -94,7 +94,7 @@ Parameters: `account_id` (string), `reason` (string or null).
 
 ### List accounts granted to this credential
 
-`GET /v1/accounts` · [web reference](https://docs.revdoku.com/api-reference/accounts#list-accounts-granted-to-this-credential)
+`GET /v1/accounts` · [web reference](https://support.revdoku.com/docs/api-reference/accounts#list-accounts-granted-to-this-credential)
 
 `client.api.list_accounts()`
 
@@ -104,7 +104,7 @@ Parameters: `limit` (integer), `cursor` (string).
 
 ### Create a client account
 
-`POST /v1/accounts` · [web reference](https://docs.revdoku.com/api-reference/accounts#create-a-client-account)
+`POST /v1/accounts` · [web reference](https://support.revdoku.com/docs/api-reference/accounts#create-a-client-account)
 
 `client.api.create_client_account(create_client_account_request)`
 
@@ -114,7 +114,7 @@ Body `create_client_account_request` (`CreateClientAccountRequest`): `name` (str
 
 ### Read one granted account
 
-`GET /v1/accounts/{account_id}` · [web reference](https://docs.revdoku.com/api-reference/accounts#read-one-granted-account)
+`GET /v1/accounts/{account_id}` · [web reference](https://support.revdoku.com/docs/api-reference/accounts#read-one-granted-account)
 
 `client.api.get_account(account_id)`
 
@@ -124,7 +124,7 @@ Parameters: `account_id` (string, required).
 
 ### Read effective account limits
 
-`GET /v1/account/limits` · [web reference](https://docs.revdoku.com/api-reference/accounts#read-effective-account-limits)
+`GET /v1/account/limits` · [web reference](https://support.revdoku.com/docs/api-reference/accounts#read-effective-account-limits)
 
 `client.api.get_account_limits()`
 
@@ -136,7 +136,7 @@ Parameters: `account_id` (string).
 
 ### List projects
 
-`GET /v1/projects` · [web reference](https://docs.revdoku.com/api-reference/projects#list-projects)
+`GET /v1/projects` · [web reference](https://support.revdoku.com/docs/api-reference/projects#list-projects)
 
 `client.list_projects()`. Full API: `client.api.list_projects()`.
 
@@ -146,17 +146,17 @@ Parameters: `account_id` (string), `reason` (string or null), `status` (string: 
 
 ### Create a project
 
-`POST /v1/projects` · [web reference](https://docs.revdoku.com/api-reference/projects#create-a-project)
+`POST /v1/projects` · [web reference](https://support.revdoku.com/docs/api-reference/projects#create-a-project)
 
 `client.create_project(username=..., domain=..., title=...)`. Full API: `client.api.create_project(create_project_request)`.
 
-Waits until the address can receive email. On revdokumail.com, email.username is the project's name, with no suffix: lowercase letters, digits and single hyphens, 3 to 63 characters, also the name of its site. A name that another project uses as an address or a site address, or that another account used, returns EMAIL_ALREADY_EXISTS; your account can use its own earlier names again. Without email.username the address takes the title's name when it is free, else two readable words. A custom domain takes the exact name. If confirmation does not finish, EMAIL_NOT_READY returns the created project_id in error.details: read that project instead of creating another. The title defaults to email.username; a title that another active project uses returns 409 PROJECT_TITLE_TAKEN. Its files come from a GitHub repository: connect one with the GitHub operations. Never retry a creation automatically.
+Waits until the address can receive email. Every project gets the address support@<name>.revdoku.net. On this built-in domain, email.username is the project's name: lowercase letters, digits and single hyphens, 3 to 63 characters, also the name of its site. A name that another project uses as an address or a site address, or that another account used, returns EMAIL_ALREADY_EXISTS; your account can use its own earlier names again. Without email.username the address takes the title's name when it is free, else two readable words. A custom domain takes the exact name. If confirmation does not finish, EMAIL_NOT_READY returns the created project_id in error.details: read that project instead of creating another. The title defaults to email.username; a title that another active project uses returns 409 PROJECT_TITLE_TAKEN. Its files come from a GitHub repository: connect one with the GitHub operations. Never retry a creation automatically.
 
 Body `create_project_request` (`CreateProjectRequest`): `project` (ProjectCreate), `account_id` (string), `reason` (string or null).
 
 ### Read a project
 
-`GET /v1/projects/{project_id}` · [web reference](https://docs.revdoku.com/api-reference/projects#read-a-project)
+`GET /v1/projects/{project_id}` · [web reference](https://support.revdoku.com/docs/api-reference/projects#read-a-project)
 
 `client.get_project(project_id)`. Full API: `client.api.get_project(project_id)`.
 
@@ -166,7 +166,7 @@ Parameters: `project_id` (string, required), `account_id` (string), `reason` (st
 
 ### Update a project title, description or metadata
 
-`PATCH /v1/projects/{project_id}` · [web reference](https://docs.revdoku.com/api-reference/projects#update-a-project-title-description-or-metadata)
+`PATCH /v1/projects/{project_id}` · [web reference](https://support.revdoku.com/docs/api-reference/projects#update-a-project-title-description-or-metadata)
 
 `client.api.update_project(project_id, update_project_request)`
 
@@ -178,7 +178,7 @@ Body `update_project_request` (`UpdateProjectRequest`): `project` (ProjectUpdate
 
 ### Permanently delete an archived project
 
-`DELETE /v1/projects/{project_id}` · [web reference](https://docs.revdoku.com/api-reference/projects#permanently-delete-an-archived-project)
+`DELETE /v1/projects/{project_id}` · [web reference](https://support.revdoku.com/docs/api-reference/projects#permanently-delete-an-archived-project)
 
 `client.api.delete_project(project_id, delete_project_request)`
 
@@ -190,7 +190,7 @@ Body `delete_project_request` (`DeleteProjectRequest`): `confirmation` (string, 
 
 ### Archive a project
 
-`POST /v1/projects/{project_id}/archive` · [web reference](https://docs.revdoku.com/api-reference/projects#archive-a-project)
+`POST /v1/projects/{project_id}/archive` · [web reference](https://support.revdoku.com/docs/api-reference/projects#archive-a-project)
 
 `client.api.archive_project(project_id, action_request)`
 
@@ -202,7 +202,7 @@ Body `action_request` (`ActionRequest`): `account_id` (string), `reason` (string
 
 ### Unarchive a project
 
-`POST /v1/projects/{project_id}/unarchive` · [web reference](https://docs.revdoku.com/api-reference/projects#unarchive-a-project)
+`POST /v1/projects/{project_id}/unarchive` · [web reference](https://support.revdoku.com/docs/api-reference/projects#unarchive-a-project)
 
 `client.api.unarchive_project(project_id, action_request)`
 
@@ -216,7 +216,7 @@ Body `action_request` (`ActionRequest`): `account_id` (string), `reason` (string
 
 ### List files
 
-`GET /v1/projects/{project_id}/files` · [web reference](https://docs.revdoku.com/api-reference/files#list-files)
+`GET /v1/projects/{project_id}/files` · [web reference](https://support.revdoku.com/docs/api-reference/files#list-files)
 
 `client.list_files(project_id)`. Full API: `client.api.list_files(project_id)`.
 
@@ -226,7 +226,7 @@ Parameters: `project_id` (string, required), `account_id` (string), `reason` (st
 
 ### Write a knowledge base file
 
-`POST /v1/projects/{project_id}/files` · [web reference](https://docs.revdoku.com/api-reference/files#write-a-knowledge-base-file)
+`POST /v1/projects/{project_id}/files` · [web reference](https://support.revdoku.com/docs/api-reference/files#write-a-knowledge-base-file)
 
 `client.api.write_file(project_id, file_write_request)`
 
@@ -238,7 +238,7 @@ Body `file_write_request` (`FileWriteRequest`): `path` (string, required), `cont
 
 ### Get an upload link for an image
 
-`POST /v1/projects/{project_id}/uploads` · [web reference](https://docs.revdoku.com/api-reference/files#get-an-upload-link-for-an-image)
+`POST /v1/projects/{project_id}/uploads` · [web reference](https://support.revdoku.com/docs/api-reference/files#get-an-upload-link-for-an-image)
 
 `client.api.create_file_upload(project_id, file_upload_request)`
 
@@ -250,7 +250,7 @@ Body `file_upload_request` (`FileUploadRequest`): `path` (string, required), `by
 
 ### Find a file by path
 
-`GET /v1/projects/{project_id}/files/by_path` · [web reference](https://docs.revdoku.com/api-reference/files#find-a-file-by-path)
+`GET /v1/projects/{project_id}/files/by_path` · [web reference](https://support.revdoku.com/docs/api-reference/files#find-a-file-by-path)
 
 `client.api.get_file_by_path(project_id, path)`
 
@@ -260,7 +260,7 @@ Parameters: `project_id` (string, required), `path` (string, required), `account
 
 ### Read file metadata
 
-`GET /v1/projects/{project_id}/files/{file_id}` · [web reference](https://docs.revdoku.com/api-reference/files#read-file-metadata)
+`GET /v1/projects/{project_id}/files/{file_id}` · [web reference](https://support.revdoku.com/docs/api-reference/files#read-file-metadata)
 
 `client.api.get_file(project_id, file_id)`
 
@@ -270,7 +270,7 @@ Parameters: `project_id` (string, required), `file_id` (string, required), `acco
 
 ### Delete a knowledge base file
 
-`DELETE /v1/projects/{project_id}/files/{file_id}` · [web reference](https://docs.revdoku.com/api-reference/files#delete-a-knowledge-base-file)
+`DELETE /v1/projects/{project_id}/files/{file_id}` · [web reference](https://support.revdoku.com/docs/api-reference/files#delete-a-knowledge-base-file)
 
 `client.api.delete_file(project_id, file_id)`
 
@@ -280,7 +280,7 @@ Parameters: `project_id` (string, required), `file_id` (string, required), `acco
 
 ### Get a download link for a file
 
-`GET /v1/projects/{project_id}/files/{file_id}/download` · [web reference](https://docs.revdoku.com/api-reference/files#get-a-download-link-for-a-file)
+`GET /v1/projects/{project_id}/files/{file_id}/download` · [web reference](https://support.revdoku.com/docs/api-reference/files#get-a-download-link-for-a-file)
 
 `client.api.get_file_download(project_id, file_id)`
 
@@ -290,7 +290,7 @@ Parameters: `project_id` (string, required), `file_id` (string, required), `vers
 
 ### List file versions
 
-`GET /v1/projects/{project_id}/files/{file_id}/versions` · [web reference](https://docs.revdoku.com/api-reference/files#list-file-versions)
+`GET /v1/projects/{project_id}/files/{file_id}/versions` · [web reference](https://support.revdoku.com/docs/api-reference/files#list-file-versions)
 
 `client.api.list_file_versions(project_id, file_id)`
 
@@ -300,7 +300,7 @@ Parameters: `project_id` (string, required), `file_id` (string, required), `acco
 
 ### Move or rename a knowledge base file
 
-`POST /v1/projects/{project_id}/files/{file_id}/move` · [web reference](https://docs.revdoku.com/api-reference/files#move-or-rename-a-knowledge-base-file)
+`POST /v1/projects/{project_id}/files/{file_id}/move` · [web reference](https://support.revdoku.com/docs/api-reference/files#move-or-rename-a-knowledge-base-file)
 
 `client.api.move_file(project_id, file_id, file_move_request)`
 
@@ -312,7 +312,7 @@ Body `file_move_request` (`FileMoveRequest`): `new_path` (string, required), `re
 
 ### Restore a file version
 
-`POST /v1/projects/{project_id}/files/{file_id}/versions/{version_id}/restore` · [web reference](https://docs.revdoku.com/api-reference/files#restore-a-file-version)
+`POST /v1/projects/{project_id}/files/{file_id}/versions/{version_id}/restore` · [web reference](https://support.revdoku.com/docs/api-reference/files#restore-a-file-version)
 
 `client.api.restore_file_version(project_id, file_id, version_id)`
 
@@ -326,7 +326,7 @@ Body `action_request` (`ActionRequest`, optional): `account_id` (string), `reaso
 
 ### List connected GitHub accounts
 
-`GET /v1/account/github/installations` · [web reference](https://docs.revdoku.com/api-reference/github#list-connected-github-accounts)
+`GET /v1/account/github/installations` · [web reference](https://support.revdoku.com/docs/api-reference/github#list-connected-github-accounts)
 
 `client.api.list_github_installations()`
 
@@ -336,7 +336,7 @@ Parameters: `account_id` (string), `limit` (integer), `cursor` (string).
 
 ### List the repositories of a GitHub account
 
-`GET /v1/account/github/installations/{installation_id}/repositories` · [web reference](https://docs.revdoku.com/api-reference/github#list-the-repositories-of-a-github-account)
+`GET /v1/account/github/installations/{installation_id}/repositories` · [web reference](https://support.revdoku.com/docs/api-reference/github#list-the-repositories-of-a-github-account)
 
 `client.api.list_github_repositories(installation_id)`
 
@@ -346,7 +346,7 @@ Parameters: `installation_id` (integer, required), `account_id` (string), `limit
 
 ### Read the GitHub repository of a project
 
-`GET /v1/projects/{project_id}/github` · [web reference](https://docs.revdoku.com/api-reference/github#read-the-github-repository-of-a-project)
+`GET /v1/projects/{project_id}/github` · [web reference](https://support.revdoku.com/docs/api-reference/github#read-the-github-repository-of-a-project)
 
 `client.api.get_github_sync(project_id)`
 
@@ -356,7 +356,7 @@ Parameters: `project_id` (string, required), `account_id` (string).
 
 ### Connect a GitHub repository
 
-`POST /v1/projects/{project_id}/github` · [web reference](https://docs.revdoku.com/api-reference/github#connect-a-github-repository)
+`POST /v1/projects/{project_id}/github` · [web reference](https://support.revdoku.com/docs/api-reference/github#connect-a-github-repository)
 
 `client.api.connect_github_repository(project_id, connect_github_repository_request)`
 
@@ -368,7 +368,7 @@ Body `connect_github_repository_request` (`ConnectGithubRepositoryRequest`): `gi
 
 ### Change GitHub sync settings
 
-`PATCH /v1/projects/{project_id}/github` · [web reference](https://docs.revdoku.com/api-reference/github#change-github-sync-settings)
+`PATCH /v1/projects/{project_id}/github` · [web reference](https://support.revdoku.com/docs/api-reference/github#change-github-sync-settings)
 
 `client.api.update_github_sync(project_id, update_github_sync_request)`
 
@@ -380,7 +380,7 @@ Body `update_github_sync_request` (`UpdateGithubSyncRequest`): `github` (GithubS
 
 ### Disconnect the GitHub repository
 
-`DELETE /v1/projects/{project_id}/github` · [web reference](https://docs.revdoku.com/api-reference/github#disconnect-the-github-repository)
+`DELETE /v1/projects/{project_id}/github` · [web reference](https://support.revdoku.com/docs/api-reference/github#disconnect-the-github-repository)
 
 `client.api.disconnect_github_repository(project_id)`
 
@@ -390,7 +390,7 @@ Parameters: `project_id` (string, required), `account_id` (string), `reason` (st
 
 ### Sync the GitHub repository now
 
-`POST /v1/projects/{project_id}/github/sync` · [web reference](https://docs.revdoku.com/api-reference/github#sync-the-github-repository-now)
+`POST /v1/projects/{project_id}/github/sync` · [web reference](https://support.revdoku.com/docs/api-reference/github#sync-the-github-repository-now)
 
 `client.api.sync_github_repository(project_id)`
 
@@ -402,7 +402,7 @@ Body `action_request` (`ActionRequest`, optional): `account_id` (string), `reaso
 
 ### List the branches that can get a preview
 
-`GET /v1/projects/{project_id}/github/branches` · [web reference](https://docs.revdoku.com/api-reference/github#list-the-branches-that-can-get-a-preview)
+`GET /v1/projects/{project_id}/github/branches` · [web reference](https://support.revdoku.com/docs/api-reference/github#list-the-branches-that-can-get-a-preview)
 
 `client.api.list_github_branches(project_id)`
 
@@ -412,7 +412,7 @@ Parameters: `project_id` (string, required), `account_id` (string).
 
 ### Get the links to add a GitHub account
 
-`GET /v1/projects/{project_id}/github/setup_link` · [web reference](https://docs.revdoku.com/api-reference/github#get-the-links-to-add-a-github-account)
+`GET /v1/projects/{project_id}/github/setup_link` · [web reference](https://support.revdoku.com/docs/api-reference/github#get-the-links-to-add-a-github-account)
 
 `client.api.get_github_setup_link(project_id)`
 
@@ -424,7 +424,7 @@ Parameters: `project_id` (string, required), `account_id` (string).
 
 ### Get the site
 
-`GET /v1/projects/{project_id}/publication` · [web reference](https://docs.revdoku.com/api-reference/publications#get-the-site)
+`GET /v1/projects/{project_id}/publication` · [web reference](https://support.revdoku.com/docs/api-reference/publications#get-the-site)
 
 `client.api.get_publication(project_id)`
 
@@ -434,7 +434,7 @@ Parameters: `project_id` (string, required).
 
 ### Publish the site
 
-`POST /v1/projects/{project_id}/publication` · [web reference](https://docs.revdoku.com/api-reference/publications#publish-the-site)
+`POST /v1/projects/{project_id}/publication` · [web reference](https://support.revdoku.com/docs/api-reference/publications#publish-the-site)
 
 `client.api.publish_project(project_id)`
 
@@ -446,7 +446,7 @@ Body `publish_request` (`PublishRequest`, optional): `access_mode` (string: `pub
 
 ### Unpublish the site
 
-`DELETE /v1/projects/{project_id}/publication` · [web reference](https://docs.revdoku.com/api-reference/publications#unpublish-the-site)
+`DELETE /v1/projects/{project_id}/publication` · [web reference](https://support.revdoku.com/docs/api-reference/publications#unpublish-the-site)
 
 `client.api.unpublish_project(project_id)`
 
@@ -456,7 +456,7 @@ Parameters: `project_id` (string, required).
 
 ### Get the preview
 
-`GET /v1/projects/{project_id}/publication/preview` · [web reference](https://docs.revdoku.com/api-reference/publications#get-the-preview)
+`GET /v1/projects/{project_id}/publication/preview` · [web reference](https://support.revdoku.com/docs/api-reference/publications#get-the-preview)
 
 `client.api.get_publication_preview(project_id)`
 
@@ -466,7 +466,7 @@ Parameters: `project_id` (string, required).
 
 ### Preview the site
 
-`POST /v1/projects/{project_id}/publication/preview` · [web reference](https://docs.revdoku.com/api-reference/publications#preview-the-site)
+`POST /v1/projects/{project_id}/publication/preview` · [web reference](https://support.revdoku.com/docs/api-reference/publications#preview-the-site)
 
 `client.api.preview_project(project_id)`
 
@@ -478,7 +478,7 @@ Body `preview_request` (`PreviewRequest`, optional): `access_mode` (string: `pub
 
 ### Get the site's analytics
 
-`GET /v1/projects/{project_id}/analytics` · [web reference](https://docs.revdoku.com/api-reference/publications#get-the-sites-analytics)
+`GET /v1/projects/{project_id}/analytics` · [web reference](https://support.revdoku.com/docs/api-reference/publications#get-the-sites-analytics)
 
 `client.api.get_project_analytics(project_id)`
 
@@ -490,7 +490,7 @@ Parameters: `project_id` (string, required), `period` (string (enum, see OpenAPI
 
 ### List tickets
 
-`GET /v1/projects/{project_id}/tickets` · [web reference](https://docs.revdoku.com/api-reference/tickets#list-tickets)
+`GET /v1/projects/{project_id}/tickets` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#list-tickets)
 
 `client.list_tickets(project_id)`. Full API: `client.api.list_tickets(project_id)`.
 
@@ -500,7 +500,7 @@ Parameters: `project_id` (string, required), `account_id` (string), `reason` (st
 
 ### Read a ticket
 
-`GET /v1/projects/{project_id}/tickets/{ticket_id}` · [web reference](https://docs.revdoku.com/api-reference/tickets#read-a-ticket)
+`GET /v1/projects/{project_id}/tickets/{ticket_id}` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#read-a-ticket)
 
 `client.get_ticket(project_id, ticket_id)`. Full API: `client.api.get_ticket(project_id, ticket_id)`.
 
@@ -510,7 +510,7 @@ Parameters: `project_id` (string, required), `ticket_id` (string, required), `ac
 
 ### Change a ticket: status, internal note or labels
 
-`PATCH /v1/projects/{project_id}/tickets/{ticket_id}` · [web reference](https://docs.revdoku.com/api-reference/tickets#change-a-ticket-status-internal-note-or-labels)
+`PATCH /v1/projects/{project_id}/tickets/{ticket_id}` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#change-a-ticket-status-internal-note-or-labels)
 
 `client.api.update_ticket(project_id, ticket_id, ticket_update_request)`
 
@@ -522,7 +522,7 @@ Body `ticket_update_request` (`TicketUpdateRequest`): `status` (string: `open`, 
 
 ### List the messages of a ticket
 
-`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages` · [web reference](https://docs.revdoku.com/api-reference/tickets#list-the-messages-of-a-ticket)
+`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#list-the-messages-of-a-ticket)
 
 `client.list_ticket_messages(project_id, ticket_id)`. Full API: `client.api.list_ticket_messages(project_id, ticket_id)`.
 
@@ -532,7 +532,7 @@ Parameters: `project_id` (string, required), `ticket_id` (string, required), `ac
 
 ### Reply to the requester
 
-`POST /v1/projects/{project_id}/tickets/{ticket_id}/messages` · [web reference](https://docs.revdoku.com/api-reference/tickets#reply-to-the-requester)
+`POST /v1/projects/{project_id}/tickets/{ticket_id}/messages` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#reply-to-the-requester)
 
 `client.reply_to_ticket(project_id, ticket_id, text)`. Full API: `client.api.reply_to_ticket(project_id, ticket_id, ticket_reply_request)`.
 
@@ -544,7 +544,7 @@ Body `ticket_reply_request` (`TicketReplyRequest`): `subject` (string), `text` (
 
 ### Read a message
 
-`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}` · [web reference](https://docs.revdoku.com/api-reference/tickets#read-a-message)
+`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#read-a-message)
 
 `client.get_ticket_message(project_id, ticket_id, message_id)`. Full API: `client.api.get_ticket_message(project_id, ticket_id, message_id)`.
 
@@ -554,7 +554,7 @@ Parameters: `project_id` (string, required), `ticket_id` (string, required), `me
 
 ### Delete a message
 
-`DELETE /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}` · [web reference](https://docs.revdoku.com/api-reference/tickets#delete-a-message)
+`DELETE /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#delete-a-message)
 
 `client.api.delete_ticket_message(project_id, ticket_id, message_id)`
 
@@ -564,7 +564,7 @@ Parameters: `project_id` (string, required), `ticket_id` (string, required), `me
 
 ### Get a download link for the original email
 
-`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}/raw` · [web reference](https://docs.revdoku.com/api-reference/tickets#get-a-download-link-for-the-original-email)
+`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}/raw` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#get-a-download-link-for-the-original-email)
 
 `client.api.get_ticket_message_original_download(project_id, ticket_id, message_id)`
 
@@ -574,7 +574,7 @@ Parameters: `project_id` (string, required), `ticket_id` (string, required), `me
 
 ### Get a download link for an attachment
 
-`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}/attachments/{attachment_id}` · [web reference](https://docs.revdoku.com/api-reference/tickets#get-a-download-link-for-an-attachment)
+`GET /v1/projects/{project_id}/tickets/{ticket_id}/messages/{message_id}/attachments/{attachment_id}` · [web reference](https://support.revdoku.com/docs/api-reference/tickets#get-a-download-link-for-an-attachment)
 
 `client.get_attachment_download(project_id, ticket_id, message_id, attachment_id)`. Full API: `client.api.get_ticket_message_attachment_download(project_id, ticket_id, message_id, attachment_id)`.
 
@@ -586,7 +586,7 @@ Parameters: `project_id` (string, required), `ticket_id` (string, required), `me
 
 ### Read the webhook
 
-`GET /v1/projects/{project_id}/webhook` · [web reference](https://docs.revdoku.com/api-reference/events#read-the-webhook)
+`GET /v1/projects/{project_id}/webhook` · [web reference](https://support.revdoku.com/docs/api-reference/events#read-the-webhook)
 
 `client.api.get_webhook(project_id)`
 
@@ -596,7 +596,7 @@ Parameters: `project_id` (string, required), `account_id` (string).
 
 ### Set the webhook
 
-`PUT /v1/projects/{project_id}/webhook` · [web reference](https://docs.revdoku.com/api-reference/events#set-the-webhook)
+`PUT /v1/projects/{project_id}/webhook` · [web reference](https://support.revdoku.com/docs/api-reference/events#set-the-webhook)
 
 `client.api.set_webhook(project_id, set_webhook_request)`
 
@@ -608,7 +608,7 @@ Body `set_webhook_request` (`SetWebhookRequest`): `webhook_url` (string (uri), r
 
 ### Remove the webhook
 
-`DELETE /v1/projects/{project_id}/webhook` · [web reference](https://docs.revdoku.com/api-reference/events#remove-the-webhook)
+`DELETE /v1/projects/{project_id}/webhook` · [web reference](https://support.revdoku.com/docs/api-reference/events#remove-the-webhook)
 
 `client.api.delete_webhook(project_id)`
 
@@ -618,7 +618,7 @@ Parameters: `project_id` (string, required), `account_id` (string).
 
 ### Get a live event subscription ticket
 
-`GET /v1/projects/{project_id}/events/subscription` · [web reference](https://docs.revdoku.com/api-reference/events#get-a-live-event-subscription-ticket)
+`GET /v1/projects/{project_id}/events/subscription` · [web reference](https://support.revdoku.com/docs/api-reference/events#get-a-live-event-subscription-ticket)
 
 `client.api.get_event_subscription(project_id)`
 
