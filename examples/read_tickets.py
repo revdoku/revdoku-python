@@ -30,19 +30,30 @@ with Revdoku(account_id=os.getenv("REVDOKU_ACCOUNT_ID") or None) as client:
     while True:
         page = client.list_tickets(project_id, limit=100, status="open", cursor=cursor).data
         for ticket in page.tickets:
-            for summary in client.list_ticket_messages(project_id, ticket.id).data.messages:
-                if summary.direction != "received":
-                    continue
-                if any(label.name == "Junk" for label in summary.labels):
-                    continue  # Revdoku withholds junk content.
-                message = read_message(client, ticket.id, summary.id)
-                if message is None:
-                    print(f"{summary.id} is still being checked. Run again later.", file=sys.stderr)
-                    continue
-                print(json.dumps({"ticket_id": ticket.id, "number": ticket.number, "channel": ticket.channel,
-                                  "id": message.id, "subject": message.subject,
-                                  "body_status": message.body_status, "body_text": message.body_text,
-                                  "attachments": [item.to_dict() for item in message.attachments or []]}, ensure_ascii=False))
+            # A page holds 20 messages by default: follow the cursor until has_more is false.
+            message_cursor = None
+            seen_messages = set()
+            while True:
+                thread = client.list_ticket_messages(project_id, ticket.id, cursor=message_cursor).data
+                for summary in thread.messages:
+                    if summary.direction != "received":
+                        continue
+                    if any(label.name == "Junk" for label in summary.labels):
+                        continue  # Revdoku withholds junk content.
+                    message = read_message(client, ticket.id, summary.id)
+                    if message is None:
+                        print(f"{summary.id} is still being checked. Run again later.", file=sys.stderr)
+                        continue
+                    print(json.dumps({"ticket_id": ticket.id, "number": ticket.number, "channel": ticket.channel,
+                                      "id": message.id, "subject": message.subject,
+                                      "body_status": message.body_status, "body_text": message.body_text,
+                                      "attachments": [item.to_dict() for item in message.attachments or []]}, ensure_ascii=False))
+                if not thread.pagination.has_more:
+                    break
+                message_cursor = thread.pagination.next_cursor
+                if not message_cursor or message_cursor in seen_messages:
+                    raise RuntimeError("Message pagination did not advance")
+                seen_messages.add(message_cursor)
         if not page.pagination.has_more:
             break
         cursor = page.pagination.next_cursor

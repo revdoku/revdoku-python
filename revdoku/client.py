@@ -18,7 +18,6 @@ from .api_client import ApiClient
 from .api_response import ApiResponse
 from .configuration import Configuration
 from .exceptions import ApiException
-from .models.create_project_request import CreateProjectRequest
 from .models.project_create import ProjectCreate
 from .models.project_email_options import ProjectEmailOptions
 from .models.ticket_reply_request import TicketReplyRequest
@@ -217,9 +216,9 @@ class Revdoku:
         """Creates one project with its email address. After an uncertain result, list projects before you create another.
         ``options`` (for example ``_request_timeout``) go to the API call."""
         email = ProjectEmailOptions(username=username, domain=domain) if username is not None or domain is not None else None
-        return self.api.create_project(CreateProjectRequest(
-            account_id=self._account_id if account_id is None else account_id,
-            project=ProjectCreate(title=title, description=description, metadata=metadata, email=email)), **options)
+        return self.api.create_project(ProjectCreate(
+            title=title, description=description, metadata=metadata, email=email,
+            account_id=self._account_id if account_id is None else account_id), **options)
 
     def list_tickets(self, project_id: str, **filters: Any) -> ListTickets200Response:
         """Lists support tickets, newest activity first. Poll with ``updated_after``."""
@@ -236,12 +235,12 @@ class Revdoku:
         return self.api.get_ticket_message(project_id, ticket_id, message_id, **self._account(options))
 
     def reply_to_ticket(self, project_id: str, ticket_id: str, text: str, html: Optional[str] = None,
-                        subject: Optional[str] = None, attachment_ids: Optional[list] = None,
+                        subject: Optional[str] = None, file_ids: Optional[list] = None,
                         account_id: Optional[str] = None, **options: Any) -> ReplyToTicket202Response:
         """Replies to the requester of a ticket. After an uncertain result, read the ticket before you reply again.
         ``options`` (for example ``_request_timeout``) go to the API call."""
         return self.api.reply_to_ticket(project_id, ticket_id, TicketReplyRequest(
-            text=text, html=html, subject=subject, attachment_ids=attachment_ids,
+            text=text, html=html, subject=subject, file_ids=file_ids,
             account_id=self._account_id if account_id is None else account_id), **options)
 
     def list_files(self, project_id: str, **filters: Any) -> ListFiles200Response:
